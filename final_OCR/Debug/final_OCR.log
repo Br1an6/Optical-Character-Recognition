@@ -1,0 +1,19 @@
+﻿已經開始建置於 2015/1/10 下午 09:24:03。
+     1>節點 2 (build 目標) 上的專案 "C:\Users\BrianLiu\Desktop\final_ocr\final_OCR\final_OCR.vcxproj"。
+     1>InitializeBuildStatus:
+         正在變更時間戳記 "Debug\final_OCR.unsuccessfulbuild"。
+       ClCompile:
+         所有輸出都是最新的。
+       Link:
+         c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\BrianLiu\Desktop\final_ocr\Debug\final_OCR.exe" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib opencv_core249.lib opencv_highgui249.lib opencv_imgproc249.lib /MANIFEST /ManifestFile:"Debug\final_OCR.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\BrianLiu\Desktop\final_ocr\Debug\final_OCR.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\BrianLiu\Desktop\final_ocr\Debug\final_OCR.lib" /MACHINE:X86 Debug\final_OCR.obj
+         final_OCR.vcxproj -> C:\Users\BrianLiu\Desktop\final_ocr\Debug\final_OCR.exe
+       Manifest:
+         c:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\BrianLiu\Desktop\final_ocr\Debug\final_OCR.exe;#1" /manifest Debug\final_OCR.exe.intermediate.manifest
+       FinalizeBuildStatus:
+         正在刪除檔案 "Debug\final_OCR.unsuccessfulbuild"。
+         正在變更時間戳記 "Debug\final_OCR.lastbuildstate"。
+     1>專案 "C:\Users\BrianLiu\Desktop\final_ocr\final_OCR\final_OCR.vcxproj" (build 目標) 建置完成。
+
+建置成功。
+
+經過時間 00:00:00.60
