@@ -1,11 +1,21 @@
-﻿已經開始建置於 2015/1/10 下午 09:24:03。
+﻿已經開始建置於 2015/1/11 下午 11:27:31。
      1>節點 2 (build 目標) 上的專案 "C:\Users\BrianLiu\Desktop\final_ocr\final_OCR\final_OCR.vcxproj"。
      1>InitializeBuildStatus:
-         正在變更時間戳記 "Debug\final_OCR.unsuccessfulbuild"。
+         由於指定了 "AlwaysCreate"，因此正在建立 "Debug\final_OCR.unsuccessfulbuild"。
        ClCompile:
          所有輸出都是最新的。
+         c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /IC:\OpenCV2.4.9\build\include /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt final_OCR.cpp
+         final_OCR.cpp
+     1>c:\opencv2.4.9\build\include\opencv2\flann\dist.h : warning C4819: 檔案含有無法在目前字碼頁 (950) 中表示的字元。請以 Unicode 格式儲存檔案以防止資料遺失
+     1>c:\opencv2.4.9\build\include\opencv2\flann\dist.h : warning C4819: 檔案含有無法在目前字碼頁 (950) 中表示的字元。請以 Unicode 格式儲存檔案以防止資料遺失
+     1>c:\opencv2.4.9\build\include\opencv2\flann\logger.h(66): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files\microsoft visual studio 10.0\vc\include\stdio.h(234) : 請參閱 'fopen' 的宣告
+     1>c:\opencv2.4.9\build\include\opencv2\flann\dist.h : warning C4819: 檔案含有無法在目前字碼頁 (950) 中表示的字元。請以 Unicode 格式儲存檔案以防止資料遺失
+     1>c:\opencv2.4.9\build\include\opencv2\flann\dist.h : warning C4819: 檔案含有無法在目前字碼頁 (950) 中表示的字元。請以 Unicode 格式儲存檔案以防止資料遺失
+     1>c:\opencv2.4.9\build\include\opencv2\legacy\compat.hpp : warning C4819: 檔案含有無法在目前字碼頁 (950) 中表示的字元。請以 Unicode 格式儲存檔案以防止資料遺失
        Link:
-         c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\BrianLiu\Desktop\final_ocr\Debug\final_OCR.exe" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib opencv_core249.lib opencv_highgui249.lib opencv_imgproc249.lib /MANIFEST /ManifestFile:"Debug\final_OCR.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\BrianLiu\Desktop\final_ocr\Debug\final_OCR.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\BrianLiu\Desktop\final_ocr\Debug\final_OCR.lib" /MACHINE:X86 Debug\final_OCR.obj
+         c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\BrianLiu\Desktop\final_ocr\Debug\final_OCR.exe" /NOLOGO /LIBPATH:C:\OpenCV2.4.9\build\x86\vc10\lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib C:\OpenCV2.4.9\build\x86\vc10\lib\opencv_core249d.lib C:\OpenCV2.4.9\build\x86\vc10\lib\opencv_highgui249d.lib C:\OpenCV2.4.9\build\x86\vc10\lib\opencv_imgproc249d.lib /MANIFEST /ManifestFile:"Debug\final_OCR.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\BrianLiu\Desktop\final_ocr\Debug\final_OCR.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\BrianLiu\Desktop\final_ocr\Debug\final_OCR.lib" /MACHINE:X86 Debug\final_OCR.obj
+         LINK : 最後的累加連結找不到或未建置 C:\Users\BrianLiu\Desktop\final_ocr\Debug\final_OCR.exe，正在執行完整連結
          final_OCR.vcxproj -> C:\Users\BrianLiu\Desktop\final_ocr\Debug\final_OCR.exe
        Manifest:
          c:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\BrianLiu\Desktop\final_ocr\Debug\final_OCR.exe;#1" /manifest Debug\final_OCR.exe.intermediate.manifest
@@ -16,4 +26,4 @@
 
 建置成功。
 
-經過時間 00:00:00.60
+經過時間 00:00:04.16
