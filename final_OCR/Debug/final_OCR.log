@@ -1,9 +1,8 @@
-﻿已經開始建置於 2015/1/11 下午 11:27:31。
+﻿已經開始建置於 2015/1/12 上午 01:44:37。
      1>節點 2 (build 目標) 上的專案 "C:\Users\BrianLiu\Desktop\final_ocr\final_OCR\final_OCR.vcxproj"。
      1>InitializeBuildStatus:
          由於指定了 "AlwaysCreate"，因此正在建立 "Debug\final_OCR.unsuccessfulbuild"。
        ClCompile:
-         所有輸出都是最新的。
          c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /IC:\OpenCV2.4.9\build\include /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt final_OCR.cpp
          final_OCR.cpp
      1>c:\opencv2.4.9\build\include\opencv2\flann\dist.h : warning C4819: 檔案含有無法在目前字碼頁 (950) 中表示的字元。請以 Unicode 格式儲存檔案以防止資料遺失
@@ -26,4 +25,4 @@
 
 建置成功。
 
-經過時間 00:00:04.16
+經過時間 00:00:03.89
