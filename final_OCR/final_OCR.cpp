@@ -35,6 +35,14 @@ int main( int argc, char** argv )
 		CvScalar color = CV_RGB( 255, 255, 255);
 		cvDrawContours( dst, contour, color, color, -1, CV_FILLED, 8 );
 	}
+	Mat res(dst);
+	for( int i= 0; i< res.rows; i++)  {  
+		for( int j=0; j< res.cols * res.channels(); j++)  {  
+            res.at<uchar>(i, j)= 255- res.at<uchar>(i, j);   // reverse pixel(black and white)
+        }  
+    }  
+	dst = &res.operator IplImage(); 
+
 	printf("The total number of contours is:%d",count);
 	cvNamedWindow( "Components", 1 );
 	cvShowImage( "Components", dst );
