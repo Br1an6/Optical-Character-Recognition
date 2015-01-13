@@ -13,6 +13,7 @@
 
  --> 改變想法，我會先根據一個range，找出是單字的部分
  因為他的順序並不是由右而左，所以我用cvBoundingRect來找
+ --> 改為全部比對完找最接近的字母
 
 */
 # include <iostream>
@@ -25,14 +26,21 @@ using namespace std ;
 using namespace cv ;
 
 IplImage * letterArray[52] ;
-
+class MatchResults{
+	public:
+	int id;
+	double matchResult;
+	void Init(int sId, double sMatchResult){
+		id = sId, matchResult = sMatchResult;}
+};
+/*
 float similarityValue[52] = // 相似度
-{0.4, 0.1, -1, 0.1, 2.3, -1, 3.5, 2.0, -1, -1, -1, -1, -1, 
--1, -1, -1, -1, -1, -1, -1, -1, 1.0, -1, 1.6, -1, 3.0,
+{0.4, 0.1, 1, 0.1, 2.3, 1, 3.5, 2.0, 1, 1, 1, 1, 1, 
+1, 1, 1, 1, 1, 1, 1, 1, 1.0, 1, 1.6, 1, 3.0,
 
-0.1, 0.1, -1, -1, -1, -1, 0.4, -1, -1, -1, -1, -1, -1, 
--1, 0.1, 0.4, -1, -1, 1, 5, 1.5, -1, -1, -1, -1, -1 } ;
-
+0.1, 0.1, 1, 1, 1, 1, 0.4, 1, 1, 1, 1, 1, 1, 
+1, 0.1, 0.4, 1, 1, 1, 5, 1.5, 1, 1, 1, 1, 1 } ;
+*/
 void readLetterArray() {
 
 	char letterName[32] ;
@@ -73,34 +81,37 @@ CvSeq* getTestContour(IplImage* test) {
 
 	return contourTest ;
 }
-
+bool CompareOperation(const MatchResults lit ,const MatchResults rit){
+	bool ret;
+    lit.matchResult<rit.matchResult? ret=true:ret=false;
+	return ret;
+}
 char matchLetter( CvSeq* input ) {
 	// 會輸入一個字
 	// fnction 輸出 比對到的字
-	
-	for ( int i = 0 ; i < 52 ; i++ ) {
+	// Brian: 改成把所有自母比對一次 再找出作接近的
+	int i = 0;
+	vector<MatchResults> matchResults; // 0:id 1:answer
+	for ( i = 0 ; i < 52 ; i++ ) {
 		// 取得要比對的 contour
 		CvSeq* contourTest = getTestContour( letterArray[i] ) ;
 		double answer = cvMatchShapes(input, contourTest, CV_CONTOURS_MATCH_I1, 0 );
-
-
-		if ( answer < similarityValue[i] ) {
-			cout << i << "\t" ;
-			return ( i < 26 ) ? ( 'A' + i ) : ( 'a' + i - 26 ) ;
-		}
+		MatchResults tempMatRes ;
+		tempMatRes.Init(i, answer);
+		matchResults.push_back(tempMatRes);
 	}
-
-	// 沒偵測到
-	return '＠' ;
+	sort(matchResults.begin(),matchResults.end(),CompareOperation); // 排序
+	cout << "Detected ID:" << matchResults[0].id << "  res:" << matchResults[0].matchResult << endl ;
+	return ( matchResults[0].id < 26 ) ? ( 'A' + matchResults[0].id ) : ( 'a' + matchResults[0].id - 26 ) ;
+	// 沒偵測到 Brian:not for now
+	// return '＠' ;
 }
-
-
 int main( int argc, char** argv ){
 
 	// 一開始會先把圖片讀進來
 	readLetterArray() ;
 
-	char * fileName = ( argc >= 2 ) ? argv[1] : "Train02.bmp" ;
+	char * fileName = ( argc >= 2 ) ? argv[1] : "Train01.bmp" ;
 
 	IplImage *src = cvLoadImage( fileName, CV_LOAD_IMAGE_GRAYSCALE ) ;
 
@@ -137,8 +148,8 @@ int main( int argc, char** argv ){
 
 	// int count=0;
 	for( ; contour != 0; contour = contour->h_next ){
-		// 把介於 1000 ~ 50 面積的放到 vector
-		if ( 1000 > cvContourArea(contour ,CV_WHOLE_SEQ, 0) && cvContourArea(contour ,CV_WHOLE_SEQ, 0) > 50 )
+		// 把介於 1500 ~ 100 面積的放到 vector // Brian Modify
+		if ( 1500 > cvContourArea(contour ,CV_WHOLE_SEQ, 0) && cvContourArea(contour ,CV_WHOLE_SEQ, 0) > 100 )
 			contourVec.push_back( contour ) ;
 
 	}
@@ -159,8 +170,8 @@ int main( int argc, char** argv ){
 	//cvNamedWindow( "ua",WINDOW_AUTOSIZE ) ;
 	//cvShowImage( "ua", ua ) ;
 
-	cvNamedWindow( "Components", WINDOW_AUTOSIZE );
-	cvShowImage( "Components", dst );
+	// cvNamedWindow( "Components", WINDOW_AUTOSIZE );
+	// cvShowImage( "Components", dst );
  
     cvWaitKey(0);
  
