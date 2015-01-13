@@ -10,7 +10,6 @@
  3.cvMatchShapes()
  0.4 0 之間
 
-
  --> 改變想法，我會先根據一個range，找出是單字的部分
  因為他的順序並不是由右而左，所以我用cvBoundingRect來找
  --> 改為全部比對完找最接近的字母
@@ -81,9 +80,38 @@ CvSeq* getTestContour(IplImage* test) {
 
 	return contourTest ;
 }
+double MatchingMethod(CvSeq* input, CvSeq* contourTest, int i){
+	IplImage* inputImg = cvCreateImage( cvSize(200, 200), 8, 3 ); // not sure about the size
+	IplImage* testImg = cvCreateImage( cvGetSize(letterArray[i]), 8, 3 );
+	cvZero( inputImg ) ;
+	cvZero( testImg ) ;
+	CvScalar color = CV_RGB( 255, 255, 255);
+	cvDrawContours( inputImg, input, color, color, -1, CV_FILLED, 8 );
+	cvDrawContours( testImg, contourTest, color, color, -1, CV_FILLED, 8 );
+
+	int result_cols =  inputImg->width - testImg->width + 1;
+	int result_rows = inputImg->height - testImg->height + 1;
+	Mat resultImg;
+	resultImg.create( result_cols, result_rows, CV_32FC1 );
+	matchTemplate( Mat(inputImg, false), Mat(testImg, false), resultImg, CV_TM_CCOEFF_NORMED );
+	normalize( resultImg, resultImg, 0, 1, NORM_MINMAX, -1, Mat() );
+
+	// 使用minMaxLoc找出最佳匹配
+	double minVal, maxVal;
+	Point minLoc, maxLoc, matchLoc;
+	minMaxLoc( resultImg, &minVal, &maxVal, &minLoc, &maxLoc, Mat() );
+	if (i == 0){
+		cvNamedWindow( "i",WINDOW_AUTOSIZE ) ;
+		cvShowImage( "i", inputImg ) ;
+		cvNamedWindow( "t",WINDOW_AUTOSIZE ) ;
+		cvShowImage( "t", testImg ) ;
+		cout << "Max:" << maxVal << endl;
+	}
+	return maxVal;
+}
 bool CompareOperation(const MatchResults lit ,const MatchResults rit){
 	bool ret;
-    lit.matchResult<rit.matchResult? ret=true:ret=false;
+    lit.matchResult>rit.matchResult? ret=true:ret=false;
 	return ret;
 }
 char matchLetter( CvSeq* input ) {
@@ -95,7 +123,7 @@ char matchLetter( CvSeq* input ) {
 	for ( i = 0 ; i < 52 ; i++ ) {
 		// 取得要比對的 contour
 		CvSeq* contourTest = getTestContour( letterArray[i] ) ;
-		double answer = cvMatchShapes(input, contourTest, CV_CONTOURS_MATCH_I1, 0 );
+		double answer = MatchingMethod(input, contourTest, i); // cvMatchShapes(input, contourTest, CV_CONTOURS_MATCH_I1, 0 );
 		MatchResults tempMatRes ;
 		tempMatRes.Init(i, answer);
 		matchResults.push_back(tempMatRes);
@@ -111,7 +139,7 @@ int main( int argc, char** argv ){
 	// 一開始會先把圖片讀進來
 	readLetterArray() ;
 
-	char * fileName = ( argc >= 2 ) ? argv[1] : "Train01.bmp" ;
+	char * fileName = ( argc >= 2 ) ? argv[1] : "Train02.bmp" ;
 
 	IplImage *src = cvLoadImage( fileName, CV_LOAD_IMAGE_GRAYSCALE ) ;
 
