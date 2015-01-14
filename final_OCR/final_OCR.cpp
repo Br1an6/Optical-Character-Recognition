@@ -179,7 +179,7 @@ bool isInRect( IplImage * testImg, CvPoint min_loc, int index ) {
 	return false ;
 }
 
-char doTemplateMatch( IplImage * templateImg, IplImage * testImg, int index ) {
+char doTemplateMatch( IplImage * templateImg, IplImage * testImg ) {
 
 	/// template match
 	int result_width = templateImg->width - testImg->width + 1;
@@ -204,18 +204,16 @@ char doTemplateMatch( IplImage * templateImg, IplImage * testImg, int index ) {
 
 
 	for ( int i = 0 ; i < 52 ; i++ ) {
-		int letterIndex = ( index == 0 ) ? i : ( ( i + 26 ) % 52 ) ;
-		if ( isInRect( testImg, min_loc, letterIndex ) )
-			return ( letterIndex < 26 ) ? ( 'A' + letterIndex ) : ( 'a' + letterIndex - 26 ) ;
+		if ( isInRect( testImg, min_loc, i ) )
+			return ( i < 26 ) ? ( 'A' + i ) : ( 'a' + i - 26 ) ;
 	}
 
-
-	return 'l' ;
+	return '@' ;
 }
 
 int main( int argc, char** argv ) {
 
-	char * fileName = ( argc >= 2 ) ? argv[1] : "Train10.bmp" ;
+	char * fileName = ( argc >= 2 ) ? argv[1] : "Train07.bmp" ;
 
 	IplImage * inputImg = cvLoadImage( fileName, CV_LOAD_IMAGE_GRAYSCALE ) ;
 
@@ -234,7 +232,7 @@ int main( int argc, char** argv ) {
 
 	/// pro-processing src
 	cvSmooth( inputImg, inputImg, CV_MEDIAN, 3, 3, 0, 0 ); // 去雜訊
-	cvThreshold( inputImg, inputImg, 35, 255, CV_THRESH_BINARY ); // 2值化, 80以上設為255, 以下設為0，設小是因為可以把兩個單字黏住的部分分開
+	cvThreshold( inputImg, inputImg, 40, 255, CV_THRESH_BINARY ); // 2值化, 80以上設為255, 以下設為0，設小是因為可以把兩個單字黏住的部分分開
 	inverseImage( inputImg ) ; // 黑白反轉
 
 	// rotate image
@@ -249,7 +247,7 @@ int main( int argc, char** argv ) {
 
 
 	/// get template image
-	IplImage * templateImg = cvLoadImage( "Template_mod.bmp", CV_LOAD_IMAGE_COLOR ) ;
+	IplImage * templateImg = cvLoadImage( "Template.bmp", CV_LOAD_IMAGE_COLOR ) ;
 	for ( int i = 0 ; i < templateImg->height ; i++ ) {
 		for ( int j = 0 ; j < templateImg->width ; j++ ) {
 			cvSet2D( templateImg, i, j, cvScalar( 255 - cvGet2D( templateImg, i, j ).val[0], 255 - cvGet2D( templateImg, i, j ).val[1], 255 - cvGet2D( templateImg, i, j ).val[2] ) ) ;
@@ -266,8 +264,8 @@ int main( int argc, char** argv ) {
 
 	}
 
-	//cvNamedWindow( "inputImg", CV_WINDOW_AUTOSIZE ) ;
-	//cvShowImage( "inputImg", inputImg ) ;
+	// cvNamedWindow( "inputImg", CV_WINDOW_AUTOSIZE ) ;
+	// cvShowImage( "inputImg", inputImg ) ;
 
 	float scaleOfTemplate = 0.0 ;
 
@@ -292,7 +290,7 @@ int main( int argc, char** argv ) {
 		// IplImage * testImg = cvCreateImage( cvSize( rect.width, rect.height ), inputImg->depth, inputImg->nChannels ) ;
 		cvResize( tempInputImg, testImg, CV_INTER_LINEAR );
 
-		cout << doTemplateMatch( templateImg, testImg, i ) ;
+		cout << doTemplateMatch( templateImg, testImg ) ;
 
 		cvResetImageROI( tempInputImg );
 		cvReleaseImage( &tempInputImg );
@@ -306,7 +304,7 @@ int main( int argc, char** argv ) {
 	//cvDestroyWindow( "inputImg" );
 
 
-	//system( "pause" ) ;
+	// system( "pause" ) ;
 
 	return 0 ;
 }
