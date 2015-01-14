@@ -247,7 +247,7 @@ int main( int argc, char** argv ) {
 
 
 	/// get template image
-	IplImage * templateImg = cvLoadImage( "Template.bmp", CV_LOAD_IMAGE_COLOR ) ;
+	IplImage * templateImg = cvLoadImage( "Template_mod.bmp", CV_LOAD_IMAGE_COLOR ) ;
 	for ( int i = 0 ; i < templateImg->height ; i++ ) {
 		for ( int j = 0 ; j < templateImg->width ; j++ ) {
 			cvSet2D( templateImg, i, j, cvScalar( 255 - cvGet2D( templateImg, i, j ).val[0], 255 - cvGet2D( templateImg, i, j ).val[1], 255 - cvGet2D( templateImg, i, j ).val[2] ) ) ;

@@ -1,0 +1,31 @@
+﻿已經開始建置於 1/15/2015 6:38:16 AM。
+     1>節點 2 (build 目標) 上的專案 "C:\Users\MrG\Desktop\final_ocr\final_OCR\final_OCR.vcxproj"。
+     1>InitializeBuildStatus:
+         由於指定了 "AlwaysCreate"，因此正在建立 "Release\final_OCR.unsuccessfulbuild"。
+       ClCompile:
+         所有輸出都是最新的。
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ID:\OpenCV2.9.4\build\include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D _MBCS /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt final_OCR.cpp
+         final_OCR.cpp
+     1>final_OCR.cpp(87): warning C4018: '<' : signed/unsigned 不相符
+     1>final_OCR.cpp(89): warning C4244: '正在初始化' : 將 'int' 轉換為 'float'，由於型別不同，可能導致資料遺失
+     1>final_OCR.cpp(90): warning C4244: '正在初始化' : 將 'int' 轉換為 'float'，由於型別不同，可能導致資料遺失
+     1>final_OCR.cpp(98): warning C4018: '<' : signed/unsigned 不相符
+     1>final_OCR.cpp(105): warning C4244: 'return' : 將 'double' 轉換為 'float'，由於型別不同，可能導致資料遺失
+     1>final_OCR.cpp(142): warning C4018: '<' : signed/unsigned 不相符
+     1>final_OCR.cpp(259): warning C4018: '<' : signed/unsigned 不相符
+     1>final_OCR.cpp(272): warning C4018: '<' : signed/unsigned 不相符
+       Link:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\MrG\Desktop\final_ocr\Release\final_OCR.exe" /NOLOGO /LIBPATH:D:\OpenCV2.9.4\build\x86\vc10\lib opencv_core249.lib opencv_imgproc249.lib opencv_highgui249.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\final_OCR.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\MrG\Desktop\final_ocr\Release\final_OCR.pdb" /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\MrG\Desktop\final_ocr\Release\final_OCR.lib" /MACHINE:X86 Release\final_OCR.obj
+         正在產生程式碼
+         已完成程式碼產生
+         final_OCR.vcxproj -> C:\Users\MrG\Desktop\final_ocr\Release\final_OCR.exe
+       Manifest:
+         C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\MrG\Desktop\final_ocr\Release\final_OCR.exe;#1" /manifest Release\final_OCR.exe.intermediate.manifest
+       FinalizeBuildStatus:
+         正在刪除檔案 "Release\final_OCR.unsuccessfulbuild"。
+         正在變更時間戳記 "Release\final_OCR.lastbuildstate"。
+     1>專案 "C:\Users\MrG\Desktop\final_ocr\final_OCR\final_OCR.vcxproj" (build 目標) 建置完成。
+
+建置成功。
+
+經過時間 00:00:02.04
