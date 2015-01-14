@@ -1,216 +1,310 @@
-﻿/*
- 1.讀到src
- 黑白反轉
- Get Contours
-
- 2.讀比對用的abcd
- 黑白反轉
- Get Contours
-
- 3.cvMatchShapes()
- 0.4 0 之間
-
- --> 改變想法，我會先根據一個range，找出是單字的部分
- 因為他的順序並不是由右而左，所以我用cvBoundingRect來找
- --> 改為全部比對完找最接近的字母
-
-*/
-# include <iostream>
-# include "opencv/cv.h"
-# include "opencv/cxcore.h"
+﻿# include "opencv/cxcore.h"
 # include "opencv/highgui.h"
+# include "opencv/cv.h"
+# include <iostream>
 # include <vector>
+# include <algorithm>
 
-using namespace std ;
-using namespace cv ;
+using namespace std;
 
-IplImage * letterArray[52] ;
-class MatchResults{
-	public:
-	int id;
-	double matchResult;
-	void Init(int sId, double sMatchResult){
-		id = sId, matchResult = sMatchResult;}
-};
-/*
-float similarityValue[52] = // 相似度
-{0.4, 0.1, 1, 0.1, 2.3, 1, 3.5, 2.0, 1, 1, 1, 1, 1, 
-1, 1, 1, 1, 1, 1, 1, 1, 1.0, 1, 1.6, 1, 3.0,
+typedef struct LetterLocation {
+	int height ;
+	int width ;
+}LetterLocation;
 
-0.1, 0.1, 1, 1, 1, 1, 0.4, 1, 1, 1, 1, 1, 1, 
-1, 0.1, 0.4, 1, 1, 1, 5, 1.5, 1, 1, 1, 1, 1 } ;
-*/
-void readLetterArray() {
+LetterLocation letterLocation[52] = {
+	{ 120, 115 },
+	{ 120, 164 },
+	{ 120, 217 },
+	{ 120, 270 },
+	{ 120, 323 },
+	{ 120, 370 },
+	{ 120, 420 },
+	{ 120, 475 },
+	{ 210, 103 },
+	{ 210, 130 },
+	{ 210, 175 },
+	{ 210, 224 },
+	{ 210, 270 },
+	{ 210, 327 },
+	{ 210, 380 },
+	{ 210, 433 },
+	{ 300, 124 },
+	{ 300, 175 },
+	{ 300, 227 },
+	{ 300, 274 },
+	{ 300, 323 },
+	{ 300, 374 },
+	{ 300, 433 },
+	{ 392, 115 },
+	{ 392, 163 },
+	{ 392, 210 },
+	{ 486, 112 },
+	{ 486, 155 },
+	{ 486, 195 },
+	{ 486, 232 },
+	{ 486, 273 },
+	{ 486, 306 },
+	{ 486, 335 },
+	{ 486, 376 },
+	{ 486, 403 },
+	{ 486, 419 },
+	{ 486, 443 },
+	{ 486, 472 },
+	{ 585, 123 },
+	{ 585, 175 },
+	{ 585, 213 },
+	{ 585, 256 },
+	{ 585, 296 },
+	{ 585, 331 },
+	{ 585, 358 },
+	{ 585, 389 },
+	{ 585, 417 },
+	{ 585, 457 },
+	{ 673, 119 },
+	{ 673, 163 },
+	{ 673, 197 },
+	{ 673, 233 }
+} ;
 
-	char letterName[32] ;
-	for ( int i = 0 ; i < 26 ; i++ ) { // upper case
-		sprintf( letterName, "LetterSet/U_%c.bmp", ( 'A' + i ) ) ;
-		letterArray[i] = cvLoadImage( letterName, CV_LOAD_IMAGE_GRAYSCALE ) ;
-	}
-	for ( int i = 0 ; i < 26 ; i++ ) { // lower case
-		sprintf( letterName, "LetterSet/U_%c.bmp", ( 'a' + i ) ) ;
-		letterArray[i+26] = cvLoadImage( letterName, CV_LOAD_IMAGE_GRAYSCALE ) ;
-	}
-
-}
 
 void inverseImage( IplImage * img ) {
-	for ( int i = 0 ; i < img->height ; i++	) {
+	for ( int i = 0 ; i < img->height ; i++ ) {
 		for ( int j = 0 ; j < img->width ; j++ ) {
-			cvSet2D( img, i, j, cvScalar( 255 - cvGet2D(img, i, j ).val[0] ) ) ;
-		} 
+			cvSet2D( img, i, j, cvScalar( 255 - cvGet2D( img, i, j ).val[0], 255 - cvGet2D( img, i, j ).val[1], 255 - cvGet2D( img, i, j ).val[2] ) ) ;
+		}
 	}
-} 
+}
 
 bool compareX( CvSeq* s1, CvSeq* s2 ) {
 	return cvBoundingRect( s1 ).x < cvBoundingRect( s2 ).x ;
-} 
-
-
-CvSeq* getTestContour(IplImage* test) {
-
-	cvThreshold( test, test, 120, 255, CV_THRESH_BINARY );// 2值化, 120以上設為255, 以下設為0
-	cvSmooth(test,test,CV_MEDIAN,3,0,0,0); // 去雜訊
-	inverseImage( test ) ; // 黑白反轉
-
-	/// find Contours test
-	CvMemStorage* storageA = cvCreateMemStorage(0);
-	CvSeq* contourTest = 0;
-	cvFindContours( test, storageA, &contourTest, sizeof(CvContour), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE );
-
-	return contourTest ;
 }
-double MatchingMethod(CvSeq* input, CvSeq* contourTest, int i){
-	IplImage* inputImg = cvCreateImage( cvSize(200, 200), 8, 3 ); // not sure about the size
-	IplImage* testImg = cvCreateImage( cvGetSize(letterArray[i]), 8, 3 );
-	cvZero( inputImg ) ;
-	cvZero( testImg ) ;
-	CvScalar color = CV_RGB( 255, 255, 255);
-	cvDrawContours( inputImg, input, color, color, -1, CV_FILLED, 8 );
-	cvDrawContours( testImg, contourTest, color, color, -1, CV_FILLED, 8 );
 
-	int result_cols =  inputImg->width - testImg->width + 1;
-	int result_rows = inputImg->height - testImg->height + 1;
-	Mat resultImg;
-	resultImg.create( result_cols, result_rows, CV_32FC1 );
-	matchTemplate( Mat(inputImg, false), Mat(testImg, false), resultImg, CV_TM_CCOEFF_NORMED );
-	normalize( resultImg, resultImg, 0, 1, NORM_MINMAX, -1, Mat() );
+float countAngle( vector<CvSeq*> contourVec ) {
 
-	// 使用minMaxLoc找出最佳匹配
-	double minVal, maxVal;
-	Point minLoc, maxLoc, matchLoc;
-	minMaxLoc( resultImg, &minVal, &maxVal, &minLoc, &maxLoc, Mat() );
-	if (i == 0){
-		cvNamedWindow( "i",WINDOW_AUTOSIZE ) ;
-		cvShowImage( "i", inputImg ) ;
-		cvNamedWindow( "t",WINDOW_AUTOSIZE ) ;
-		cvShowImage( "t", testImg ) ;
-		cout << "Max:" << maxVal << endl;
+	float * diff = new float[contourVec.size( ) - 1] ;
+
+	for ( int i = 0 ; i < contourVec.size( ) - 1 ; i++ ) {
+
+		float a = cvBoundingRect( contourVec.at( i ) ).y + cvBoundingRect( contourVec.at( i ) ).height ;
+		float b = cvBoundingRect( contourVec.at( i + 1 ) ).y + cvBoundingRect( contourVec.at( i + 1 ) ).height ;
+
+		diff[i] = b - a ;
+
 	}
-	return maxVal;
-}
-bool CompareOperation(const MatchResults lit ,const MatchResults rit){
-	bool ret;
-    lit.matchResult>rit.matchResult? ret=true:ret=false;
-	return ret;
-}
-char matchLetter( CvSeq* input ) {
-	// 會輸入一個字
-	// fnction 輸出 比對到的字
-	// Brian: 改成把所有自母比對一次 再找出作接近的
-	int i = 0;
-	vector<MatchResults> matchResults; // 0:id 1:answer
-	for ( i = 0 ; i < 52 ; i++ ) {
-		// 取得要比對的 contour
-		CvSeq* contourTest = getTestContour( letterArray[i] ) ;
-		double answer = MatchingMethod(input, contourTest, i); // cvMatchShapes(input, contourTest, CV_CONTOURS_MATCH_I1, 0 );
-		MatchResults tempMatRes ;
-		tempMatRes.Init(i, answer);
-		matchResults.push_back(tempMatRes);
+
+	float x = 0 ;
+	float y = 0 ;
+	for ( int i = 0 ; i < contourVec.size( ) - 1 ; i++ ) {
+		if ( diff[i] > 5 || diff[i] < -5 ) continue ;
+
+		x++ ;
+		y += diff[i] ;
 	}
-	sort(matchResults.begin(),matchResults.end(),CompareOperation); // 排序
-	cout << "Detected ID:" << matchResults[0].id << "  res:" << matchResults[0].matchResult << endl ;
-	return ( matchResults[0].id < 26 ) ? ( 'A' + matchResults[0].id ) : ( 'a' + matchResults[0].id - 26 ) ;
-	// 沒偵測到 Brian:not for now
-	// return '＠' ;
+
+	return y / x - 0.2 ;
 }
-int main( int argc, char** argv ){
 
-	// 一開始會先把圖片讀進來
-	readLetterArray() ;
+vector<CvSeq*> doFindContour( IplImage *src ) {
 
-	char * fileName = ( argc >= 2 ) ? argv[1] : "Train02.bmp" ;
+	/// find Contours src
+	IplImage* temp = cvCreateImage( cvGetSize( src ), src->depth, src->nChannels );
+	cvCopy( src, temp ) ;
+	CvMemStorage* storage = cvCreateMemStorage( 0 );
+	CvSeq* contour = 0;
+	cvFindContours( temp, storage, &contour, sizeof( CvContour ), CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE );
+	//cvZero( dst ); //clear
 
-	IplImage *src = cvLoadImage( fileName, CV_LOAD_IMAGE_GRAYSCALE ) ;
+	/// get Contours and sort by horizontal
+	vector<CvSeq*> contourVec ;
+	// int count=0;
+	for ( ; contour != 0; contour = contour->h_next ) {
+		// 把介於 1500 ~ 50 面積的放到 vector // Brian Modify
+		if ( 1200 > cvContourArea( contour, CV_WHOLE_SEQ, 0 ) && cvContourArea( contour, CV_WHOLE_SEQ, 0 ) > 50 )
+			contourVec.push_back( contour ) ;
 
-	if ( src == NULL ) {
+	}
+
+	// 因為不是從右到左，所以先排序一次
+	sort( contourVec.begin( ), contourVec.end( ), compareX ) ;
+
+
+	return contourVec ;
+}
+
+
+IplImage * rotateImage( IplImage *src ) {
+
+	vector<CvSeq*> contourVec = doFindContour( src ) ;
+
+	cvZero( src ) ;
+
+	for ( int i = 0 ; i < contourVec.size( ) ; i++ ) {
+		cvDrawContours( src, contourVec.at( i ), CV_RGB( 255, 255, 255 ), CV_RGB( 255, 255, 255 ), -1, CV_FILLED, 8 );
+	}
+
+	float angle = countAngle( contourVec ) ;
+
+	float m[6];
+
+	m[0] = ( float ) ( cos( -angle * 2 * CV_PI / 180. ) );
+	m[1] = ( float ) ( sin( -angle * 2 * CV_PI / 180. ) );
+	m[3] = -m[1];
+	m[4] = m[0];
+
+	//將旋轉中心移至圖像中間
+	m[2] = src->width * 0.5f;
+	m[5] = src->height * 0.5f;
+
+
+	CvMat M = cvMat( 2, 3, CV_32F, m );
+
+
+	IplImage *pImgDst = cvCreateImage( cvGetSize( src ), src->depth, src->nChannels ) ;
+	cvZero( pImgDst ) ;
+	cvGetQuadrangleSubPix( src, pImgDst, &M );
+
+	cvCopy( pImgDst, src ) ;
+
+	return src ;
+
+}
+
+bool isInRect( IplImage * testImg, CvPoint min_loc, int index ) {
+
+	if ( ( min_loc.x < letterLocation[index].width && letterLocation[index].width < min_loc.x + testImg->width ) &&
+		 ( min_loc.y < letterLocation[index].height && letterLocation[index].height < min_loc.y + testImg->height ) )
+		 return true ;
+
+	return false ;
+}
+
+char doTemplateMatch( IplImage * templateImg, IplImage * testImg ) {
+
+	/// template match
+	int result_width = templateImg->width - testImg->width + 1;
+	int result_height = templateImg->height - testImg->height + 1;
+
+	IplImage * resultImg = cvCreateImage( cvSize( result_width, result_height ), 32, 1 );
+	cvMatchTemplate( templateImg, testImg, resultImg, CV_TM_SQDIFF ) ;
+
+	double min_val;
+	double max_val;
+	CvPoint min_loc;
+	CvPoint max_loc;
+	cvMinMaxLoc( resultImg, &min_val, &max_val, &min_loc, &max_loc, NULL );
+
+	cvRectangle( templateImg, cvPoint( min_loc.x, min_loc.y ), cvPoint( ( min_loc.x + testImg->width ), ( min_loc.y + testImg->height ) ), CV_RGB( 0, 255, 0 ), 1 );
+	cvRectangle( templateImg, cvPoint( max_loc.x, max_loc.y ), cvPoint( ( max_loc.x + testImg->width ), ( max_loc.y + testImg->height ) ), CV_RGB( 255, 0, 0 ), 1 );
+
+	//cout << "min_loc.x " << min_loc.x << endl ;
+	//cout << "min_loc.y " << min_loc.y << endl ;
+	//cout << "width " << min_loc.x + testImg->width << endl ;
+	//cout << "height " << min_loc.y + testImg->height << endl ;
+
+
+	for ( int i = 0 ; i < 52 ; i++ ) {
+		if ( isInRect( testImg, min_loc, i ) )
+			return ( i < 26 ) ? ( 'A' + i ) : ( 'a' + i - 26 ) ;
+	}
+
+	return '@' ;
+}
+
+int main( int argc, char** argv ) {
+
+	char * fileName = ( argc >= 2 ) ? argv[1] : "Train01.bmp" ;
+
+	IplImage * inputImg = cvLoadImage( fileName, CV_LOAD_IMAGE_GRAYSCALE ) ;
+
+	if ( inputImg == NULL ) {
 		cout << "image not found" << endl ;
 		system( "pause" ) ;
 		return 1 ;
 	}
 
 	/// cut image rect I want 
-    cvSetImageROI( src, cvRect( src->width/6, src->height/4, src->width/6*4 , src->height/4 ) ) ; // 設定我要圖片的範圍
-	IplImage * temp = cvCreateImage(cvGetSize(src), src->depth, src->nChannels) ;
-	cvCopy(src, temp, NULL);
-	cvReleaseImage(&src);
-	src = temp ;
+	cvSetImageROI( inputImg, cvRect( inputImg->width / 6, inputImg->height / 4, inputImg->width / 6 * 4, inputImg->height / 3 ) ) ; // 設定我要圖片的範圍
+	IplImage * temp = cvCreateImage( cvGetSize( inputImg ), inputImg->depth, inputImg->nChannels ) ;
+	cvCopy( inputImg, temp, NULL );
+	//cvReleaseImage( &src );
+	inputImg = temp ;
 
 	/// pro-processing src
-	cvSmooth(src,src,CV_MEDIAN,3,3,0,0); // 去雜訊
-	cvThreshold( src, src, 80, 255, CV_THRESH_BINARY ); // 2值化, 80以上設為255, 以下設為0，設小是因為可以把兩個單字黏住的部分分開
-	inverseImage( src ) ; // 黑白反轉
-	
-	/// find Contours src
-	IplImage* dst = cvCreateImage( cvGetSize(src), 8, 3 );
-	CvMemStorage* storage = cvCreateMemStorage(0);
-	CvSeq* contour = 0;
-	cvFindContours( src, storage, &contour, sizeof(CvContour), CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE );
-	cvZero( dst ); //clear
+	cvSmooth( inputImg, inputImg, CV_MEDIAN, 3, 3, 0, 0 ); // 去雜訊
+	cvThreshold( inputImg, inputImg, 80, 255, CV_THRESH_BINARY ); // 2值化, 80以上設為255, 以下設為0，設小是因為可以把兩個單字黏住的部分分開
+	inverseImage( inputImg ) ; // 黑白反轉
 
-	//----------------------------------------------------------------------------------------------------------
+	// rotate image
+	rotateImage( inputImg ) ;
 
-	/// get Contours and sort by horizontal
+	//cvNamedWindow( "inputImg", CV_WINDOW_AUTOSIZE ) ;
+	//cvShowImage( "inputImg", inputImg ) ;
 
-	vector<CvSeq*> contourVec ;
+	vector<CvSeq*> contourVec = doFindContour( inputImg ) ;
 
-	// int count=0;
-	for( ; contour != 0; contour = contour->h_next ){
-		// 把介於 1500 ~ 100 面積的放到 vector // Brian Modify
-		if ( 1500 > cvContourArea(contour ,CV_WHOLE_SEQ, 0) && cvContourArea(contour ,CV_WHOLE_SEQ, 0) > 100 )
-			contourVec.push_back( contour ) ;
+	//----------------------------------------------------------------------------------------------------------------------
 
-	}
 
-	// 因為不是從右到左，所以先排序一次
-	sort( contourVec, compareX ) ;
-
-	// 依照排序左到右做 match
-	for ( int i = 0 ; i < contourVec.size() ; i++ ){
-		cout << matchLetter( contourVec.at(i) ) << endl ;
+	/// get template image
+	IplImage * templateImg = cvLoadImage( "Template.bmp", CV_LOAD_IMAGE_COLOR ) ;
+	for ( int i = 0 ; i < templateImg->height ; i++ ) {
+		for ( int j = 0 ; j < templateImg->width ; j++ ) {
+			cvSet2D( templateImg, i, j, cvScalar( 255 - cvGet2D( templateImg, i, j ).val[0], 255 - cvGet2D( templateImg, i, j ).val[1], 255 - cvGet2D( templateImg, i, j ).val[2] ) ) ;
+			// cvSet2D( templateImg, i, j, cvScalar( 255 - cvGet2D( templateImg, i, j ).val[0] ) ) ;
+		}
 	}
 
 
+	//for ( int i = 0 ; i < contourVec.size( ) ; i++ ) {
+	//	cvDrawContours( inputImg, contourVec.at( i ), CV_RGB( 255, 255, 255 ), CV_RGB( 255, 255, 255 ), -1, CV_FILLED, 8 );
 
-    cvNamedWindow( "src",WINDOW_AUTOSIZE ) ;
-    cvShowImage( "src", src ) ;
+	//	CvRect rect = cvBoundingRect( contourVec.at( i ) ) ;
+	//	cvRectangle( inputImg, cvPoint( rect.x, rect.y ), cvPoint( rect.x + rect.width, rect.y + rect.height ), CV_RGB( 255, 255, 255 ) ) ;
 
-	//cvNamedWindow( "ua",WINDOW_AUTOSIZE ) ;
-	//cvShowImage( "ua", ua ) ;
+	//}
 
-	// cvNamedWindow( "Components", WINDOW_AUTOSIZE );
-	// cvShowImage( "Components", dst );
- 
-    cvWaitKey(0);
- 
-    cvReleaseImage(&src);
-    cvDestroyWindow("src");
+	//cvNamedWindow( "inputImg", CV_WINDOW_AUTOSIZE ) ;
+	//cvShowImage( "inputImg", inputImg ) ;
 
-    //cvReleaseImage(&ua);
-    //cvDestroyWindow("ua");
+	float scaleOfTemplate = 0.0 ;
 
-	cvReleaseImage(&dst);
-    cvDestroyWindow("Components");
+	for ( int i = 0 ; i < contourVec.size( ) /*contourVec.size()*/ ; i++ ) {
+		/// get test image
+		IplImage * tempInputImg = cvCreateImage( cvGetSize( inputImg ), inputImg->depth, 3 ) ;
+		cvCvtColor( inputImg, tempInputImg, CV_GRAY2BGR ) ;
 
-    return 0 ;
+		CvRect rect = cvBoundingRect( contourVec.at( i ) ) ;
+		cvSetImageROI( tempInputImg, rect ) ; // 設定我要圖片的範圍
+
+		
+		scaleOfTemplate = ( i == 0 ) ? ( 53.0f / ( float ) rect.height ) : scaleOfTemplate ;
+		int tempWidth = ( int ) ( ( float ) rect.width * scaleOfTemplate );
+		int tempHeight = ( int ) ( ( float ) rect.height * scaleOfTemplate );
+		if ( tempHeight < 53 ) tempWidth++, tempHeight++;
+		IplImage * testImg = cvCreateImage( cvSize( tempWidth, tempHeight ), tempInputImg->depth, 3 ) ;
+
+		//cvNamedWindow( "testImg", CV_WINDOW_AUTOSIZE ) ;
+		//cvShowImage( "testImg", testImg ) ;
+
+		// IplImage * testImg = cvCreateImage( cvSize( rect.width, rect.height ), inputImg->depth, inputImg->nChannels ) ;
+		cvResize( tempInputImg, testImg, CV_INTER_LINEAR );
+
+		cout << doTemplateMatch( templateImg, testImg ) ;
+
+		cvResetImageROI( tempInputImg );
+		cvReleaseImage( &tempInputImg );
+	}
+
+	cout << endl ;
+
+	// cvWaitKey( 0 );
+
+	//cvReleaseImage( &inputImg );
+	//cvDestroyWindow( "inputImg" );
+
+
+	system( "pause" ) ;
+
+	return 0 ;
 }
