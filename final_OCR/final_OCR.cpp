@@ -13,58 +13,58 @@ typedef struct LetterLocation {
 }LetterLocation;
 
 LetterLocation letterLocation[52] = {
-	{ 120, 115 },
-	{ 120, 164 },
-	{ 120, 217 },
-	{ 120, 270 },
-	{ 120, 323 },
-	{ 120, 370 },
-	{ 120, 420 },
-	{ 120, 475 },
-	{ 210, 103 },
-	{ 210, 130 },
-	{ 210, 175 },
-	{ 210, 224 },
-	{ 210, 270 },
-	{ 210, 327 },
-	{ 210, 380 },
-	{ 210, 433 },
-	{ 300, 124 },
-	{ 300, 175 },
-	{ 300, 227 },
-	{ 300, 274 },
-	{ 300, 323 },
-	{ 300, 374 },
-	{ 300, 433 },
-	{ 392, 115 },
-	{ 392, 163 },
-	{ 392, 210 },
-	{ 486, 112 },
-	{ 486, 155 },
-	{ 486, 195 },
-	{ 486, 232 },
-	{ 486, 273 },
-	{ 486, 306 },
-	{ 486, 335 },
-	{ 486, 376 },
-	{ 486, 403 },
-	{ 486, 419 },
-	{ 486, 443 },
-	{ 486, 472 },
-	{ 585, 123 },
-	{ 585, 175 },
-	{ 585, 213 },
-	{ 585, 256 },
-	{ 585, 296 },
-	{ 585, 331 },
-	{ 585, 358 },
-	{ 585, 389 },
-	{ 585, 417 },
-	{ 585, 457 },
-	{ 673, 119 },
-	{ 673, 163 },
-	{ 673, 197 },
-	{ 673, 233 }
+	{ 120, 115 }, // A
+	{ 120, 164 }, // B
+	{ 120, 217 }, // C
+	{ 120, 270 }, // D
+	{ 120, 323 }, // E
+	{ 120, 370 }, // F
+	{ 120, 420 }, // G
+	{ 120, 475 }, // H
+	{ 210, 103 }, // I
+	{ 210, 130 }, // J
+	{ 210, 175 }, // K
+	{ 210, 224 }, // L
+	{ 210, 270 }, // M
+	{ 210, 327 }, // N
+	{ 210, 380 }, // O
+	{ 210, 433 }, // P
+	{ 300, 124 }, // Q
+	{ 300, 175 }, // R
+	{ 300, 227 }, // S
+	{ 300, 274 }, // T
+	{ 300, 323 }, // U
+	{ 300, 374 }, // V
+	{ 300, 433 }, // W
+	{ 392, 115 }, // X
+	{ 392, 163 }, // Y
+	{ 392, 210 }, // Z
+	{ 486, 112 }, // a
+	{ 486, 155 }, // b
+	{ 486, 195 }, // c
+	{ 486, 232 }, // d
+	{ 486, 273 }, // e
+	{ 486, 306 }, // f
+	{ 486, 335 }, // g
+	{ 469, 376 }, // h
+	{ 490, 35 }, // i
+	{ 486, 419 }, // j
+	{ 486, 443 }, // k
+	{ 486, 472 }, // l
+	{ 585, 123 }, // m
+	{ 585, 175 }, // n
+	{ 585, 213 }, // o
+	{ 585, 256 }, // p
+	{ 585, 296 }, // q
+	{ 585, 331 }, // r
+	{ 585, 358 }, // s
+	{ 585, 389 }, // t
+	{ 585, 417 }, // u
+	{ 585, 457 }, // v
+	{ 673, 119 }, // w
+	{ 673, 163 }, // x
+	{ 673, 197 }, // y
+	{ 673, 233 } // z
 } ;
 
 
@@ -120,7 +120,7 @@ vector<CvSeq*> doFindContour( IplImage *src ) {
 	// int count=0;
 	for ( ; contour != 0; contour = contour->h_next ) {
 		// 把介於 1500 ~ 50 面積的放到 vector // Brian Modify
-		if ( 1200 > cvContourArea( contour, CV_WHOLE_SEQ, 0 ) && cvContourArea( contour, CV_WHOLE_SEQ, 0 ) > 50 )
+		if ( 1200 > cvContourArea( contour, CV_WHOLE_SEQ, 0 ) && cvContourArea( contour, CV_WHOLE_SEQ, 0 ) > 30 )
 			contourVec.push_back( contour ) ;
 
 	}
@@ -213,7 +213,7 @@ char doTemplateMatch( IplImage * templateImg, IplImage * testImg ) {
 
 int main( int argc, char** argv ) {
 
-	char * fileName = ( argc >= 2 ) ? argv[1] : "Train01.bmp" ;
+	char * fileName = ( argc >= 2 ) ? argv[1] : "Train07.bmp" ;
 
 	IplImage * inputImg = cvLoadImage( fileName, CV_LOAD_IMAGE_GRAYSCALE ) ;
 
@@ -224,7 +224,7 @@ int main( int argc, char** argv ) {
 	}
 
 	/// cut image rect I want 
-	cvSetImageROI( inputImg, cvRect( inputImg->width / 6, inputImg->height / 4, inputImg->width / 6 * 4, inputImg->height / 3 ) ) ; // 設定我要圖片的範圍
+	cvSetImageROI( inputImg, cvRect( inputImg->width / 6, inputImg->height / 4, inputImg->width / 6 * 4, inputImg->height / 2 ) ) ; // 設定我要圖片的範圍
 	IplImage * temp = cvCreateImage( cvGetSize( inputImg ), inputImg->depth, inputImg->nChannels ) ;
 	cvCopy( inputImg, temp, NULL );
 	//cvReleaseImage( &src );
@@ -232,7 +232,7 @@ int main( int argc, char** argv ) {
 
 	/// pro-processing src
 	cvSmooth( inputImg, inputImg, CV_MEDIAN, 3, 3, 0, 0 ); // 去雜訊
-	cvThreshold( inputImg, inputImg, 80, 255, CV_THRESH_BINARY ); // 2值化, 80以上設為255, 以下設為0，設小是因為可以把兩個單字黏住的部分分開
+	cvThreshold( inputImg, inputImg, 40, 255, CV_THRESH_BINARY ); // 2值化, 80以上設為255, 以下設為0，設小是因為可以把兩個單字黏住的部分分開
 	inverseImage( inputImg ) ; // 黑白反轉
 
 	// rotate image
@@ -256,16 +256,16 @@ int main( int argc, char** argv ) {
 	}
 
 
-	//for ( int i = 0 ; i < contourVec.size( ) ; i++ ) {
-	//	cvDrawContours( inputImg, contourVec.at( i ), CV_RGB( 255, 255, 255 ), CV_RGB( 255, 255, 255 ), -1, CV_FILLED, 8 );
+	for ( int i = 0 ; i < contourVec.size( ) ; i++ ) {
+		cvDrawContours( inputImg, contourVec.at( i ), CV_RGB( 255, 255, 255 ), CV_RGB( 255, 255, 255 ), -1, CV_FILLED, 8 );
 
-	//	CvRect rect = cvBoundingRect( contourVec.at( i ) ) ;
-	//	cvRectangle( inputImg, cvPoint( rect.x, rect.y ), cvPoint( rect.x + rect.width, rect.y + rect.height ), CV_RGB( 255, 255, 255 ) ) ;
+		CvRect rect = cvBoundingRect( contourVec.at( i ) ) ;
+		cvRectangle( inputImg, cvPoint( rect.x, rect.y ), cvPoint( rect.x + rect.width, rect.y + rect.height ), CV_RGB( 255, 255, 255 ) ) ;
 
-	//}
+	}
 
-	//cvNamedWindow( "inputImg", CV_WINDOW_AUTOSIZE ) ;
-	//cvShowImage( "inputImg", inputImg ) ;
+	cvNamedWindow( "inputImg", CV_WINDOW_AUTOSIZE ) ;
+	cvShowImage( "inputImg", inputImg ) ;
 
 	float scaleOfTemplate = 0.0 ;
 
@@ -298,7 +298,7 @@ int main( int argc, char** argv ) {
 
 	cout << endl ;
 
-	// cvWaitKey( 0 );
+	cvWaitKey( 0 );
 
 	//cvReleaseImage( &inputImg );
 	//cvDestroyWindow( "inputImg" );
